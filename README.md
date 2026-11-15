@@ -13,6 +13,8 @@ Learning Objectives:
 from SlicerLab/:
 
 ```bash
+module load miniconda
+
 conda create --name "SlicerLab"
 conda activate SlicerLab
 pip install -r requirements.txt
