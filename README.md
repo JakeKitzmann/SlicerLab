@@ -7,3 +7,16 @@ Learning Objectives:
 - Move existing network weights from training environment to usage
 
 - Build object-oriented 3D Slicer module to run existing U-Net
+
+## Setup
+
+from SlicerLab/:
+
+```bash
+conda create --name "SlicerLab"
+conda activate SlicerLab
+pip install -r requirements.txt
+python -m ipykernel install --user --name SlicerLab --display-name "SlicerLab"
+```
+
+Now open the notebook and select SlicerLab
