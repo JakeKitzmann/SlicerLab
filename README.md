@@ -17,7 +17,8 @@ module load miniconda
 
 conda create --name "SlicerLab"
 conda activate SlicerLab
-conda config --add pkgs_dirs .
+mkdir -p pip-cache
+python -m pip config set global.cache-dir ./pip-cache
 pip install -r requirements.txt
 python -m ipykernel install --user --name SlicerLab --display-name "SlicerLab"
 ```
