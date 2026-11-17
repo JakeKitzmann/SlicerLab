@@ -1,0 +1,5 @@
+cache/*
+urls/*
+urls.txt
+.pip_cache
+
