@@ -37,4 +37,9 @@ Re-Download 3D Slicer with
 curl -fsSL https://download.slicer.org/install.sh
 ```
 
+now we can call it with
+
+```bash
+Slicer
+```
 
