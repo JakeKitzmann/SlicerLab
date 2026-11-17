@@ -24,3 +24,17 @@ python -m ipykernel install --user --name SlicerLab --display-name "SlicerLab"
 ```
 
 Now open the notebook and select SlicerLab
+
+Work through the notebook to train the U-Net and get our weights.
+
+## Slicer
+
+We're not going to use the default slicer, as we want a version we can modify.
+
+Re-Download 3D Slicer with
+
+```bash
+curl -fsSL https://download.slicer.org/install.sh
+```
+
+
