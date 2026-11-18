@@ -76,4 +76,107 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
 
         print("Segmenting...")
 
+class DoubleConv(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
 
+        self.conv = nn.Sequential(
+            nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True),
+
+            nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1, bias=False),
+            nn.BatchNorm2d(out_channels),
+            nn.ReLU(inplace=True)
+        )
+
+    def forward(self, x):
+        return self.conv(x)
+
+class UNet2D(nn.Module):
+    def __init__(self, in_channels=1, num_classes=2, features=32):
+        super().__init__()
+
+        # encoder
+        self.enc1 = DoubleConv(in_channels, features)
+        self.enc2 = DoubleConv(features, features * 2)
+        self.enc3 = DoubleConv(features * 2, features * 4)
+        self.enc4 = DoubleConv(features * 4, features * 8)
+
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        # bottleneck
+        self.bottleneck = DoubleConv(features * 8, features * 16)
+
+        # decoder
+        self.up4 = nn.ConvTranspose2d(features * 16, features * 8, kernel_size=2, stride=2)
+        self.dec4 = DoubleConv(features * 16, features * 8)
+
+        self.up3 = nn.ConvTranspose2d(features * 8, features * 4, kernel_size=2, stride=2)
+        self.dec3 = DoubleConv(features * 8, features * 4)
+
+        self.up2 = nn.ConvTranspose2d(features * 4, features * 2, kernel_size=2, stride=2)
+        self.dec2 = DoubleConv(features * 4, features * 2)
+
+        self.up1 = nn.ConvTranspose2d(features * 2, features, kernel_size=2, stride=2)
+        self.dec1 = DoubleConv(features * 2, features)
+
+        # classification
+        self.out = nn.Conv2d(features, num_classes, kernel_size=1)
+
+    def forward(self, x):
+
+        e1 = self.enc1(x)
+        e2 = self.enc2(self.pool(e1))
+        e3 = self.enc3(self.pool(e2))
+        e4 = self.enc4(self.pool(e3))
+
+        b = self.bottleneck(self.pool(e4))
+
+        d4 = self.up4(b)
+        d4 = F.interpolate(d4, size=e4.shape[2:], mode="bilinear", align_corners=False)
+        d4 = self.dec4(torch.cat([d4, e4], dim=1))
+
+        d3 = self.up3(d4)
+        d3 = F.interpolate(d3, size=e3.shape[2:], mode="bilinear", align_corners=False)
+        d3 = self.dec3(torch.cat([d3, e3], dim=1))
+
+        d2 = self.up2(d3)
+        d2 = F.interpolate(d2, size=e2.shape[2:], mode="bilinear", align_corners=False)
+        d2 = self.dec2(torch.cat([d2, e2], dim=1))
+
+        d1 = self.up1(d2)
+        d1 = F.interpolate(d1, size=e1.shape[2:], mode="bilinear", align_corners=False)
+        d1 = self.dec1(torch.cat([d1, e1], dim=1))
+
+        return self.out(d1)
+
+def predict_volume(model, image, device, batch_size=8):
+    volume = sitk.GetArrayFromImage(image).astype(np.float32)
+    prediction = np.zeros(volume.shape, dtype=np.uint16)
+
+    model.eval()
+
+    with torch.no_grad():
+
+        for start in range(0, volume.shape[2], batch_size):
+
+            end = min(start + batch_size, volume.shape[2])
+
+            # Extract slices along axis 2
+            slices = volume[:, :, start:end]
+            slices = np.moveaxis(slices, 2, 0)
+
+            # Normalize each slice
+            mean = slices.mean(axis=(1, 2), keepdims=True)
+            std = slices.std(axis=(1, 2), keepdims=True)
+            slices = (slices - mean) / (std + 1e-8)
+
+            inputs = torch.from_numpy(slices.copy()).float().unsqueeze(1).to(device)
+
+            outputs = model(inputs)
+            predictions = outputs.argmax(dim=1).cpu().numpy()
+
+            prediction[:, :, start:end] = np.moveaxis(predictions, 0, 2)
+
+    return prediction
