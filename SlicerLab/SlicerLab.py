@@ -2,6 +2,15 @@ import importlib.util
 import slicer
 import qt
 import vtk
+import sys
+
+PACKAGE_DIR = "/nfsscratch/Users/jkitzmann/SlicerLab/slicer-packages"
+CACHE_DIR = "/nfsscratch/Users/jkitzmann/SlicerLab/slicer-cache"
+
+# computers pick the first executable that matches in PATH so we can hack this by 
+# just sticking ours in index 0
+if PACKAGE_DIR not in sys.path:
+    sys.path.insert(0, PACKAGE_DIR)
 
 # imports 
 pkgs = {
@@ -15,7 +24,11 @@ missing = [package for module, package in pkgs.items() if importlib.util.find_sp
 
 if missing:
     print('installing missing pkg:', missing)
-    slicer.util.pip_install(missing)
+    slicer.util.pip_install(
+            missing,
+            extra_args=["--target", PACKAGE_DIR,
+                        "--cache-dir", CACHE_DIR]
+            )
 
     slicer.util.errorDisplay('Dependencies installed. Please restart Slicer') 
     raise RuntimeError('Restart Slicer to load dependencies')

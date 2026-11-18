@@ -32,6 +32,7 @@ Work through the notebook to train the U-Net and get our weights.
 in the top of the .py file change this to your name:
 ```python
 PACKAGE_DIR = '/nfsscratch/Users/jkitzmann/SlicerLab/slicer-packages'
+CACHE_DIR = '/nfsscratch/Users/jkitzmann/SlicerLab/slicer-cache'
 ```
 
 ## Slicer

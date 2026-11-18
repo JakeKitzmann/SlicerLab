@@ -5,3 +5,5 @@ urls.txt
 pip_cache/*
 pip-cache/*
 best_unet2d.pth
+slicer-packages/*
+slicer-cache/*
