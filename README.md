@@ -15,9 +15,11 @@ from SlicerLab/:
 ```bash
 module load miniconda
 
-conda create --name "SlicerLab"
+conda create --name "SlicerLab" Python=3.11 -y
 conda activate SlicerLab
 mkdir -p .pip_cache
+export PYTHONNOUSERSITE=1                       # ignore ~/.local packages
+export PIP_CACHE_DIR=/nfsscratch/Users/jkitzmann/.pip-cache
 export PIP_CACHE_DIR="$(pwd)/.pip_cache"
 mkdir -p slicer-cache
 mkdir -p slicer-packages
