@@ -1,41 +1,18 @@
-import importlib.util
-import slicer
-import qt
-import vtk
 import sys
 
 PACKAGE_DIR = "/nfsscratch/Users/jkitzmann/SlicerLab/slicer-packages"
-CACHE_DIR = "/nfsscratch/Users/jkitzmann/SlicerLab/slicer-cache"
 
-# computers pick the first executable that matches in PATH so we can hack this by 
-# just sticking ours in index 0
 if PACKAGE_DIR not in sys.path:
     sys.path.insert(0, PACKAGE_DIR)
 
-# imports 
-pkgs = {
-    "SimpleITK": "SimpleITK",
-    "numpy": "numpy",
-    "torch": "torch",
-    "torchvision": "torchvision",
-}
-
-missing = [package for module, package in pkgs.items() if importlib.util.find_spec(module) is None]
-
-if missing:
-    print('installing missing pkg:', missing)
-    slicer.util.pip_install(
-            missing,
-            extra_args=["--target", PACKAGE_DIR,
-                        "--cache-dir", CACHE_DIR]
-            )
-
-    slicer.util.errorDisplay('Dependencies installed. Please restart Slicer') 
-    raise RuntimeError('Restart Slicer to load dependencies')
+import os
+import slicer
+import qt
+import vtk
 
 from slicer.ScriptedLoadableModule import (
     ScriptedLoadableModule,
-    ScriptedLoadableModuleWidget
+    ScriptedLoadableModuleWidget,
 )
 
 import SimpleITK as sitk
@@ -45,19 +22,31 @@ import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 
-# change to mps if on mac
+import copy
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+print("PyTorch:", torch.__version__)
+print("Torchvision:", torchvision.__version__)
+print("Device:", device)
+
 class SlicerLab(ScriptedLoadableModule):
+
     def __init__(self, parent):
         super().__init__(parent)
+
         self.parent.title = "BME:5240 Slicer Lab"
         self.parent.categories = ["DLMI"]
         self.parent.dependencies = []
-        self.parent.contributors = ["Your Name", "Jake Kitzmann", "Sarah Gerard"]
+        self.parent.contributors = [
+            "<YOU>",
+            "Jake Kitzmann",
+            "Sarah Gerard",
+        ]
         self.parent.helpText = "DLMI Lab"
 
 class SlicerLabWidget(ScriptedLoadableModuleWidget):
+
     def setup(self):
         super().setup()
 
@@ -71,10 +60,10 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
 
         self.layout.addWidget(qt.QLabel("Input Volume"))
         self.layout.addWidget(self.volumeSelector)
-        
+
         self.runButton = qt.QPushButton("Segment")
         self.layout.addWidget(self.runButton)
-        self.runButton.connect('clicked(bool)', self.onRun)
+        self.runButton.connect("clicked(bool)", self.onRun)
 
         self.layout.addStretch(1)
 
@@ -85,5 +74,6 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
             slicer.util.errorDisplay("Select a volume to segment.")
             return
 
-        print('Segmenting...')
-        
+        print("Segmenting...")
+
+

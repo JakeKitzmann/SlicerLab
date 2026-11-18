@@ -19,6 +19,7 @@ conda create --name "SlicerLab"
 conda activate SlicerLab
 mkdir -p .pip_cache
 export PIP_CACHE_DIR="$(pwd)/.pip_cache"
+mkdir -p slicer-cache
 mkdir -p slicer-packages
 pip install -r requirements.txt
 ```
@@ -29,11 +30,6 @@ Work through the notebook to train the U-Net and get our weights.
 
 ## The .py file
 
-in the top of the .py file change this to your name:
-```python
-PACKAGE_DIR = '/nfsscratch/Users/jkitzmann/SlicerLab/slicer-packages'
-CACHE_DIR = '/nfsscratch/Users/jkitzmann/SlicerLab/slicer-cache'
-```
 
 ## Slicer
 
@@ -45,10 +41,32 @@ Re-Download 3D Slicer with
 curl -fsSL https://download.slicer.org/install.sh | bash
 ```
 
-now we can call it with
+Now we can call it with
 
 ```bash
 Slicer
+```
+
+Open the Slicer Python window (Python Logo in the corner) and enter:
+
+```python
+import os
+import sys
+import slicer
+
+package_dir = "/nfsscratch/Users/<YOU>/SlicerLab/slicer-packages"
+cache_dir = "/nfsscratch/Users/<YOU>/SlicerLab/slicer-cache"
+
+os.makedirs(package_dir, exist_ok=True)
+os.makedirs(cache_dir, exist_ok=True)
+
+os.environ["PIP_CACHE_DIR"] = cache_dir
+
+slicer.util.pip_install([
+    "--target", package_dir,
+    "torch",
+    "torchvision",
+])
 ```
 
 In the top left corner of slicer go to:
