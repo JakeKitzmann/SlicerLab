@@ -1,11 +1,39 @@
+import importlib.util
 import slicer
 import qt
 import vtk
+
+# imports 
+pkgs = {
+    "SimpleITK": "SimpleITK",
+    "numpy": "numpy",
+    "torch": "torch",
+    "torchvision": "torchvision",
+}
+
+missing = [package for module, package in pkgs.items() if importlib.util.find_spec(module) is None]
+
+if missing:
+    print('installing missing pkg:', missing)
+    slicer.util.pip_install(missing)
+
+    slicer.util.errorDisplay('Dependencies installed. Please restart Slicer') 
+    raise RuntimeError('Restart Slicer to load dependencies')
 
 from slicer.ScriptedLoadableModule import (
     ScriptedLoadableModule,
     ScriptedLoadableModuleWidget
 )
+
+import SimpleITK as sitk
+import numpy as np
+import torch
+import torchvision
+import torch.nn as nn
+import torch.nn.functional as F
+
+# change to mps if on mac
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class SlicerLab(ScriptedLoadableModule):
     def __init__(self, parent):
@@ -46,3 +74,4 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
 
         print('Segmenting...')
         
+class UNet

@@ -3,4 +3,5 @@ urls
 urls.txt
 .pip_cache/*
 pip_cache/*
+pip-cache/*
 best_unet2d.pth
