@@ -74,4 +74,3 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
 
         print('Segmenting...')
         
-class UNet

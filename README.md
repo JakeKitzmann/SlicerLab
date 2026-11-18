@@ -19,12 +19,20 @@ conda create --name "SlicerLab"
 conda activate SlicerLab
 mkdir -p .pip_cache
 export PIP_CACHE_DIR="$(pwd)/.pip_cache"
+mkdir -p slicer-packages
 pip install -r requirements.txt
 ```
 
 Now open the notebook and select SlicerLab
 
 Work through the notebook to train the U-Net and get our weights.
+
+## The .py file
+
+in the top of the .py file change this to your name:
+```python
+PACKAGE_DIR = '/nfsscratch/Users/jkitzmann/SlicerLab/slicer-packages'
+```
 
 ## Slicer
 
