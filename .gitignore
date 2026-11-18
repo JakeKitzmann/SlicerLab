@@ -7,3 +7,4 @@ pip-cache/*
 best_unet2d.pth
 slicer-packages/*
 slicer-cache/*
+Data/*
