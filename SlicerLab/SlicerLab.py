@@ -1,11 +1,12 @@
 import sys
 
+import os
 PACKAGE_DIR = "/nfsscratch/Users/jkitzmann/SlicerLab/slicer-packages"
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "best_unet2d.pth")
 
 if PACKAGE_DIR not in sys.path:
     sys.path.insert(0, PACKAGE_DIR)
 
-import os
 import slicer
 import qt
 import vtk
@@ -50,6 +51,17 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
     def setup(self):
         super().setup()
 
+        # Load model
+        self.model = UNet2D()  
+        self.model.load_state_dict(
+            torch.load(MODEL_PATH, map_location=device, weights_only=True)
+        )
+        self.model.to(device)
+        self.model.eval()
+
+        print(f"Model loaded on {device}")
+
+        # Existing UI setup
         self.volumeSelector = slicer.qMRMLNodeComboBox()
         self.volumeSelector.nodeTypes = ["vtkMRMLScalarVolumeNode"]
         self.volumeSelector.selectNodeUponCreation = False
@@ -66,7 +78,7 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
         self.runButton.connect("clicked(bool)", self.onRun)
 
         self.layout.addStretch(1)
-
+        
     def onRun(self):
         volume = self.volumeSelector.currentNode()
 
@@ -74,7 +86,57 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
             slicer.util.errorDisplay("Select a volume to segment.")
             return
 
+        if "model" not in globals():
+            slicer.util.errorDisplay("Model has not been loaded.")
+            return
+
         print("Segmenting...")
+
+        image_array = slicer.util.arrayFromVolume(volume)
+        image = sitk.GetImageFromArray(image_array)
+
+        prediction = predict_volume(
+            self.model,
+            image,
+            device,
+            batch_size=8
+        )
+
+        segmentationNode = slicer.mrmlScene.AddNewNodeByClass(
+            "vtkMRMLSegmentationNode",
+            "Prediction"
+        )
+
+        segmentationNode.CreateDefaultDisplayNodes()
+        segmentationNode.SetReferenceImageGeometryParameterFromVolumeNode(
+            volume
+        )
+
+        segmentation = segmentationNode.GetSegmentation()
+
+        labels = np.unique(prediction)
+
+        for label in labels:
+            if label == 0:
+                continue
+
+            segmentId = segmentation.AddEmptySegment(
+                f"Class_{label}",
+                f"Class {label}"
+            )
+
+            binary_mask = (prediction == label).astype(np.uint8)
+
+            slicer.util.updateSegmentBinaryLabelmapFromArray(
+                binary_mask,
+                segmentationNode,
+                segmentId,
+                volume
+            )
+
+        segmentationNode.GetDisplayNode().SetVisibility(True)
+
+        print("Segmentation complete!")
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
@@ -158,25 +220,28 @@ def predict_volume(model, image, device, batch_size=8):
     model.eval()
 
     with torch.no_grad():
-
         for start in range(0, volume.shape[2], batch_size):
-
             end = min(start + batch_size, volume.shape[2])
 
-            # Extract slices along axis 2
             slices = volume[:, :, start:end]
             slices = np.moveaxis(slices, 2, 0)
 
-            # Normalize each slice
             mean = slices.mean(axis=(1, 2), keepdims=True)
             std = slices.std(axis=(1, 2), keepdims=True)
             slices = (slices - mean) / (std + 1e-8)
 
-            inputs = torch.from_numpy(slices.copy()).float().unsqueeze(1).to(device)
+            inputs = (
+                torch.from_numpy(slices.copy())
+                .float()
+                .unsqueeze(1)
+                .to(device)
+            )
 
             outputs = model(inputs)
             predictions = outputs.argmax(dim=1).cpu().numpy()
 
-            prediction[:, :, start:end] = np.moveaxis(predictions, 0, 2)
+            prediction[:, :, start:end] = np.moveaxis(
+                predictions, 0, 2
+            )
 
     return prediction
