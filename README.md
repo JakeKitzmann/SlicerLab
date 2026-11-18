@@ -20,7 +20,6 @@ conda activate SlicerLab
 mkdir -p .pip_cache
 export PIP_CACHE_DIR="$(pwd)/.pip_cache"
 pip install -r requirements.txt
-python -m ipykernel install --user --name SlicerLab --display-name "SlicerLab"
 ```
 
 Now open the notebook and select SlicerLab
@@ -34,7 +33,7 @@ We're not going to use the default slicer, as we want a version we can modify.
 Re-Download 3D Slicer with
 
 ```bash
-curl -fsSL https://download.slicer.org/install.sh
+curl -fsSL https://download.slicer.org/install.sh | bash
 ```
 
 now we can call it with
@@ -42,4 +41,17 @@ now we can call it with
 ```bash
 Slicer
 ```
+
+In the top left corner of slicer go to:
+```
+Edit->Application Settings->Modules
+```
+
+Now click the two arrows to the right of Additional module paths:
+
+Press Add.
+
+Then add the folder /nfsscratch/Users/<you>/SlicerLab/SlicerLab
+
+Press yes to restart slicer.
 
