@@ -19,8 +19,7 @@ conda create --name "SlicerLab" Python=3.11 -y
 conda activate SlicerLab
 mkdir -p .pip_cache
 export PYTHONNOUSERSITE=1                       # ignore ~/.local packages
-export PIP_CACHE_DIR=/nfsscratch/Users/jkitzmann/.pip-cache
-export PIP_CACHE_DIR="$(pwd)/.pip_cache"
+export PIP_CACHE_DIR=/nfsscratch/Users/<YOU>/.pip-cache
 mkdir -p slicer-cache
 mkdir -p slicer-packages
 pip install -r requirements.txt
@@ -29,9 +28,6 @@ pip install -r requirements.txt
 Now open the notebook and select SlicerLab
 
 Work through the notebook to train the U-Net and get our weights.
-
-## The .py file
-
 
 ## Slicer
 
@@ -43,10 +39,17 @@ Re-Download 3D Slicer with
 curl -fsSL https://download.slicer.org/install.sh | bash
 ```
 
-Now we can call it with
+Now we can call it locally with:
 
 ```bash
 Slicer
+```
+
+If that doesn't work:
+
+```bash
+cd ~/.local/bin 
+./Slicer
 ```
 
 Open the Slicer Python window (Python Logo in the corner) and enter:
@@ -83,4 +86,7 @@ Press Add.
 Then add the folder /nfsscratch/Users/<you>/SlicerLab/SlicerLab
 
 Press yes to restart slicer.
+
+## Running the application
+
 

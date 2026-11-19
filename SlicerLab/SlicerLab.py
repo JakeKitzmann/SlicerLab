@@ -18,6 +18,7 @@ from slicer.ScriptedLoadableModule import (
 )
 
 import SimpleITK as sitk
+import sitkUtils
 import numpy as np
 import torch
 import torchvision
@@ -94,9 +95,10 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
 
         print("Segmenting...")
 
-        image_array = slicer.util.arrayFromVolume(volume)
-        image = sitk.GetImageFromArray(image_array)
+        # Full geometry (spacing, origin, direction) in LPS, as SimpleITK expects
+        image = sitkUtils.PullVolumeFromSlicer(volume)
 
+        # Returned in the same voxel layout as the input volume
         prediction = predict_volume(
             self.model,
             image,
@@ -215,22 +217,44 @@ class UNet2D(nn.Module):
 
         return self.out(d1)
 
+# Orientation the model was trained in: LPS, i.e. array [z, y, x] =
+# [inferior->superior, anterior->posterior, right->left], axial slices along
+# axis 0. This is the layout of Slicer's sample CTs (e.g. CTChest).
+CANONICAL_ORIENTATION = "LPS"
+
+
+def normalize_slices(x, eps=1e-8):
+    """Z-score each 2D slice independently (last two axes). Matches training."""
+    mean = x.mean(axis=(-2, -1), keepdims=True)
+    std = x.std(axis=(-2, -1), keepdims=True)
+    return (x - mean) / (std + eps)
+
+
 def predict_volume(model, image, device, batch_size=8):
-    volume = sitk.GetArrayFromImage(image).astype(np.float32)
-    prediction = np.zeros(volume.shape, dtype=np.uint16)
+    """Segment a SimpleITK image of any orientation.
+
+    The image is reoriented to CANONICAL_ORIENTATION, segmented slice by slice,
+    and the prediction is reoriented back. The returned array has the same
+    [k, j, i] layout as sitk.GetArrayFromImage(image).
+    """
+    original_orientation = (
+        sitk.DICOMOrientImageFilter_GetOrientationFromDirectionCosines(
+            image.GetDirection()
+        )
+    )
+    canonical = sitk.DICOMOrient(image, CANONICAL_ORIENTATION)
+
+    volume = sitk.GetArrayFromImage(canonical).astype(np.float32)
+    prediction = np.zeros(volume.shape, dtype=np.uint8)
 
     model.eval()
 
     with torch.no_grad():
-        for start in range(0, volume.shape[2], batch_size):
-            end = min(start + batch_size, volume.shape[2])
+        for start in range(0, volume.shape[0], batch_size):
+            end = min(start + batch_size, volume.shape[0])
 
-            slices = volume[:, :, start:end]
-            slices = np.moveaxis(slices, 2, 0)
-
-            mean = slices.mean(axis=(1, 2), keepdims=True)
-            std = slices.std(axis=(1, 2), keepdims=True)
-            slices = (slices - mean) / (std + 1e-8)
+            # Axial slices (array is [z, y, x])
+            slices = normalize_slices(volume[start:end])
 
             inputs = (
                 torch.from_numpy(slices.copy())
@@ -240,10 +264,10 @@ def predict_volume(model, image, device, batch_size=8):
             )
 
             outputs = model(inputs)
-            predictions = outputs.argmax(dim=1).cpu().numpy()
+            prediction[start:end] = outputs.argmax(dim=1).cpu().numpy()
 
-            prediction[:, :, start:end] = np.moveaxis(
-                predictions, 0, 2
-            )
+    prediction_image = sitk.GetImageFromArray(prediction)
+    prediction_image.CopyInformation(canonical)
+    prediction_image = sitk.DICOMOrient(prediction_image, original_orientation)
 
-    return prediction
+    return sitk.GetArrayFromImage(prediction_image)
