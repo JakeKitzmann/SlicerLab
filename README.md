@@ -134,3 +134,7 @@ Select the segmentation created and click "Show 3D" to create a 3D rendering of 
 
 <img width="1914" height="1608" alt="image" src="https://github.com/user-attachments/assets/b15f8bb7-d44a-45f0-b687-dedaf2ae261f" />
 
+## Distribution
+
+
+
