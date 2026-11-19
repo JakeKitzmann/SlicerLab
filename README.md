@@ -208,9 +208,8 @@ Now, we're going to simulate a lab member attempting to use the software with li
 Delete slicer with:
 
 ```bash
-rm -rf ~/.local/opt/Slicer-5.12.4-linux-amd64
-rm -rf ~/.local/opt/Slicer
-rm ~/.local/bin/Slicer
+curl -fsSL https://download.slicer.org/install.sh | bash
+option 4
 ```
 Note you'll have to close slicer for this to work.
 
