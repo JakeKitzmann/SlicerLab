@@ -1,3 +1,4 @@
+<img width="615" height="314" alt="Screenshot from 2026-11-18 19-30-20" src="https://github.com/user-attachments/assets/98dcba3d-5368-43eb-9338-561ca1724b2e" />
 # DLMI Slicer Lab
 
 Learning Objectives:
@@ -51,6 +52,9 @@ If that doesn't work:
 cd ~/.local/bin 
 ./Slicer
 ```
+
+<img width="615" height="314" alt="Screenshot from 2026-11-18 19-30-20" src="https://github.com/user-attachments/assets/e726e743-e23b-4054-9606-a7c410720fa8" />
+
 
 Open the Slicer Python window (Python Logo in the corner) and enter:
 
