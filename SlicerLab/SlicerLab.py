@@ -92,10 +92,6 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
             slicer.util.errorDisplay("Select a volume to segment.")
             return
 
-        if "model" not in globals():
-            slicer.util.errorDisplay("Model has not been loaded.")
-            return
-
         print("Segmenting...")
 
         image_array = slicer.util.arrayFromVolume(volume)
