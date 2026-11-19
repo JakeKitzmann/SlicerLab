@@ -2,7 +2,8 @@ import sys
 
 import os
 PACKAGE_DIR = "/nfsscratch/Users/jkitzmann/SlicerLab/slicer-packages"
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "best_unet2d.pth")
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "best_unet2d.pth")
+MODEL_PATH = os.path.abspath(MODEL_PATH)
 
 if PACKAGE_DIR not in sys.path:
     sys.path.insert(0, PACKAGE_DIR)
@@ -52,10 +53,15 @@ class SlicerLabWidget(ScriptedLoadableModuleWidget):
         super().setup()
 
         # Load model
-        self.model = UNet2D()  
-        self.model.load_state_dict(
-            torch.load(MODEL_PATH, map_location=device, weights_only=True)
+        self.model = UNet2D()
+
+        checkpoint = torch.load(
+            MODEL_PATH,
+            map_location=device,
+            weights_only=True
         )
+
+        self.model.load_state_dict(checkpoint["model_state_dict"])
         self.model.to(device)
         self.model.eval()
 
