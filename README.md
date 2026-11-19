@@ -201,9 +201,28 @@ dist.md
 
 Publish the release.
 
-Now, download the release, run through the steps in slicer, and ensure it still works!
+Now, we're going to simulate a lab member attempting to use the software with little to no experience with the project.
 
-A good idea is to delete slicer, redownload it, and make sure you can run the commmand in dist.md and get up and running quickly on a new copy of slicer
+Delete slicer with:
+
+```bash
+rm -rf ~/.local/opt/Slicer-5.12.4-linux-amd64
+rm -rf ~/.local/opt/Slicer
+rm ~/.local/bin/Slicer
+``
+Note you'll have to close slicer for this to work.
+
+Re-Download 3D Slicer with
+
+```bash
+curl -fsSL https://download.slicer.org/install.sh | bash
+```
+
+Run the commands from dist.md in the slicer Python module, then add the distribution folder to the module paths as before.
+
+Restart Slicer and re-test on the slicer sample images.
+
+Congratulations! You've officially created (pretty bad) distributable research software!
 
 **A completed lab is the github link, with a release containing the Python file, network weights, and dist.md**
 
