@@ -8,3 +8,6 @@ best_unet2d.pth
 slicer-packages/*
 slicer-cache/*
 Data/*
+*.ipynb_checkpoints*
+*.nfs
+*__pycache__*
