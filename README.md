@@ -134,7 +134,49 @@ Select the segmentation created and click "Show 3D" to create a 3D rendering of 
 
 <img width="1914" height="1608" alt="image" src="https://github.com/user-attachments/assets/b15f8bb7-d44a-45f0-b687-dedaf2ae261f" />
 
-## Distribution
+## Distribution and Release
+
+Navigate to 
+
+```bash
+/nfsscratch/Users/<YOU>/SlicerLab/SlicerLab
+```
+
+You should see SlicerLab.py
+
+Create a distributable version with:
+
+```bash
+cp SlicerLab.py SlicerLabV001.py
+```
+
+Now open the file with vim, Nano, or VSCode:
+
+```bash
+vim SlicerLabV001.py
+
+OR
+
+code SlicerLabV001.py # if more comfortable
+```
+
+<img width="2195" height="1651" alt="image" src="https://github.com/user-attachments/assets/b4d86cd8-9fae-4723-8d92-71f616ff1fc1" />
+
+Add yourself as a contributor.
+
+Then, change line 5 to
+
+```python
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "best_unet2d.pth")
+```
+This makes it look in the current directory instead of back one.
+
+if in vim, save with :wq
+
+if in code, ctrl+S
+
+
+
 
 
 
