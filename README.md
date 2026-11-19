@@ -4,13 +4,13 @@ Learning Objectives:
 
 - Explore building a basic U-Net from scratch
 
-- Move existing network weights from training environment to usage
+- Reuse network weights for application beyond network development
 
-- Build object-oriented 3D Slicer module to run existing U-Net
-
-## Setup
+- Create distributable software that anyone can use!
 
 # Do not clone this repository. **Fork it.**
+
+## Setup
 
 from SlicerLab/:
 
@@ -136,7 +136,7 @@ Select the segmentation created and click "Show 3D" to create a 3D rendering of 
 
 <img width="1914" height="1608" alt="image" src="https://github.com/user-attachments/assets/b15f8bb7-d44a-45f0-b687-dedaf2ae261f" />
 
-## Distribution and Release
+## Change code to distribution
 
 Navigate to 
 
@@ -176,6 +176,56 @@ This makes it look in the current directory instead of back one.
 if in vim, save with :wq
 
 if in code, ctrl+S
+
+In the GitHub homepage, click Create New Release
+
+<img width="652" height="571" alt="image" src="https://github.com/user-attachments/assets/eef83fe8-3878-476e-8816-b0a76ac90abe" />
+
+## Release and versioning
+
+<img width="524" height="247" alt="image" src="https://github.com/user-attachments/assets/56eed8ad-a1c5-4ae5-8af7-4ccc4d18d317" />
+
+Create a new tag, V0.1.0
+
+Title Version 0.1.0
+
+Click Attach binaries
+
+add:
+
+```
+best_unet2d.pth
+SlicerLabV001.py
+dist.md
+```
+
+<img width="1511" height="1244" alt="image" src="https://github.com/user-attachments/assets/ff53e073-3ba3-4708-8646-245cb0079ab8" />
+
+Publish the release.
+
+Now, we're going to simulate a lab member attempting to use the software with little to no experience with the project.
+
+Delete slicer with:
+
+```bash
+curl -fsSL https://download.slicer.org/install.sh | bash
+option 4
+```
+Note you'll have to close slicer for this to work.
+
+Re-Download 3D Slicer with
+
+```bash
+curl -fsSL https://download.slicer.org/install.sh | bash
+```
+
+Run the commands from dist.md in the slicer Python module, then add the distribution folder to the module paths as before.
+
+Restart Slicer and re-test on the slicer sample images.
+
+Congratulations! You've officially created (pretty bad) distributable research software!
+
+**A completed lab is the github link, with a release containing the Python file, network weights, and dist.md**
 
 
 
