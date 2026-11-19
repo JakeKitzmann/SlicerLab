@@ -173,6 +173,11 @@ MODEL_PATH = os.path.join(os.path.dirname(__file__), "best_unet2d.pth")
 ```
 This makes it look in the current directory instead of back one.
 
+**Important!**: Change all of the classes from SlicerLab... to SlicerLabV001...
+
+<img width="1511" height="1244" alt="image" src="https://github.com/user-attachments/assets/63590dc0-8668-4dbe-a93d-c6db2e6d0a91" />
+
+
 if in vim, save with :wq
 
 if in code, ctrl+S
