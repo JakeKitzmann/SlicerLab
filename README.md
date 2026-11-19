@@ -209,7 +209,7 @@ Delete slicer with:
 rm -rf ~/.local/opt/Slicer-5.12.4-linux-amd64
 rm -rf ~/.local/opt/Slicer
 rm ~/.local/bin/Slicer
-``
+```
 Note you'll have to close slicer for this to work.
 
 Re-Download 3D Slicer with
