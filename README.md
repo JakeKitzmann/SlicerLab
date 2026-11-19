@@ -8,7 +8,7 @@ Learning Objectives:
 
 - Create distributable software that anyone can use!
 
-# Do not clone this repository. **Fork it.**
+# Do not clone this repository! **Fork it!**
 
 ## Setup
 
