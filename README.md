@@ -177,6 +177,36 @@ if in vim, save with :wq
 
 if in code, ctrl+S
 
+In the GitHub homepage, click Create New Release
+
+<img width="652" height="571" alt="image" src="https://github.com/user-attachments/assets/eef83fe8-3878-476e-8816-b0a76ac90abe" />
+
+<img width="524" height="247" alt="image" src="https://github.com/user-attachments/assets/56eed8ad-a1c5-4ae5-8af7-4ccc4d18d317" />
+
+Create a new tag, V0.1.0
+
+Title Version 0.1.0
+
+Click Attach binaries
+
+add:
+
+```
+best_unet2d.pth
+SlicerLabV001.py
+dist.md
+```
+
+<img width="1511" height="1244" alt="image" src="https://github.com/user-attachments/assets/ff53e073-3ba3-4708-8646-245cb0079ab8" />
+
+Publish the release.
+
+Now, download the release, run through the steps in slicer, and ensure it still works!
+
+A good idea is to delete slicer, redownload it, and make sure you can run the commmand in dist.md and get up and running quickly on a new copy of slicer
+
+**A completed lab is the github link, with a release containing the Python file, network weights, and dist.md**
+
 
 
 
