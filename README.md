@@ -208,7 +208,19 @@ dist.md
 
 Publish the release.
 
-Now, we're going to simulate a lab member attempting to use the software with little to no experience with the project.
+## Now, we're going to simulate a lab member attempting to use the software with little to no experience with the project.
+
+Download all 3 files from the Releases page. 
+
+You'll likely have to download them to Scratch as the home accounts are small.
+
+Make a folder to hold them and point slicer to with
+
+```bash
+mkdir -p SlicerLab
+```
+
+Then move them into the folder with mv or cp.
 
 Delete slicer with:
 
