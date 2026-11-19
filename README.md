@@ -10,6 +10,8 @@ Learning Objectives:
 
 ## Setup
 
+# Do not clone this repository. **Fork it.**
+
 from SlicerLab/:
 
 ```bash
